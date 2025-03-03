@@ -9,10 +9,10 @@
  */
 function formatDate(date, fromFormat, toFormat) {
   // write code here
-  const partitions = [];
+  const partitions = {};
 
   for (let i = 0; i < 3; i++) {
-    partitions[fromFormat[i]] = date.split(fromFormat.at(-1))[i];
+    partitions[fromFormat[i][0]] = date.split(fromFormat.at(-1))[i];
   }
 
   let newFormat = '';
@@ -23,26 +23,30 @@ function formatDate(date, fromFormat, toFormat) {
     switch (toFormat[i]) {
       case 'MM':
       case 'DD':
-        pDate = partitions[toFormat[i]];
+        pDate = partitions[toFormat[i][0]];
         break;
       default:
-        if (toFormat[i].length === 2) {
-          pDate = partitions[toFormat[i]].slice(-1, -3);
-        } else {
+        pDate = partitions[toFormat[i][0]];
+
+        if (
+          toFormat[i].length === 2 &&
+          partitions[toFormat[i][0]].length === 4
+        ) {
+          pDate = partitions[toFormat[i][0]].slice(-2);
+        }
+
+        if (partitions[toFormat[i][0]].length === 2) {
           pDate =
-            partitions[toFormat[i]] < 30
-              ? `19${partitions[toFormat[i]]}`
-              : `20${partitions[toFormat[i]]}`;
+            partitions[toFormat[i][0]] < 30
+              ? `20${partitions[toFormat[i][0]]}`
+              : `19${partitions[toFormat[i][0]]}`;
         }
         break;
     }
 
     newFormat +=
-      i + 1 === toFormat.length ? `${pDate}` : `${pDate}${toFormat.at(-1)}`;
+      i + 1 === toFormat.length - 1 ? `${pDate}` : `${pDate}${toFormat.at(-1)}`;
   }
-
-  /* eslint no-console: ["error", { allow: ["warn", "log"] }] */
-  console.log(newFormat);
 
   return newFormat;
 }
