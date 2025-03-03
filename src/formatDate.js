@@ -9,43 +9,47 @@
  */
 function formatDate(date, fromFormat, toFormat) {
   // write code here
-  const partitions = {};
+  const partitions = [];
+  const fromSeparator =
+    fromFormat.filter((x) => x.toLowerCase() === x.toUpperCase())[0] ?? '-';
+  const toSeparator =
+    toFormat.filter((x) => x.toLowerCase() === x.toUpperCase())[0] ?? '-';
+  const formatA = fromFormat.filter((x) => x !== fromSeparator);
+  const formatB = toFormat.filter((x) => x !== toSeparator);
 
-  for (let i = 0; i < 3; i++) {
-    partitions[fromFormat[i][0]] = date.split(fromFormat.at(-1))[i];
+  for (let i = 0; i < formatA.length; i++) {
+    partitions[formatA[i].slice(0, 2)] = date.split(fromSeparator)[i];
   }
 
   let newFormat = '';
 
-  for (let i = 0; i < toFormat.length - 1; i++) {
+  for (let i = 0; i < formatB.length; i++) {
     let pDate = '';
+    const part = formatB[i].slice(0, 2);
 
-    switch (toFormat[i]) {
+    switch (part) {
       case 'MM':
       case 'DD':
-        pDate = partitions[toFormat[i][0]];
+        pDate = partitions[part];
         break;
       default:
-        pDate = partitions[toFormat[i][0]];
+        pDate = partitions[part];
 
-        if (
-          toFormat[i].length === 2 &&
-          partitions[toFormat[i][0]].length === 4
-        ) {
-          pDate = partitions[toFormat[i][0]].slice(-2);
+        if (formatB[i].length === 2 && partitions[part].length === 4) {
+          pDate = partitions[part].slice(-2);
         }
 
-        if (partitions[toFormat[i][0]].length === 2) {
-          pDate =
-            partitions[toFormat[i][0]] < 30
-              ? `20${partitions[toFormat[i][0]]}`
-              : `19${partitions[toFormat[i][0]]}`;
+        if (partitions[part].length === 2) {
+          const yearA = +`20${partitions[part]}`;
+          const yearB = +`19${partitions[part]}`;
+
+          pDate = yearA < 2030 ? yearA.toString() : yearB.toString();
         }
         break;
     }
 
     newFormat +=
-      i + 1 === toFormat.length - 1 ? `${pDate}` : `${pDate}${toFormat.at(-1)}`;
+      i + 1 === formatB.length ? `${pDate}` : `${pDate}${toSeparator}`;
   }
 
   return newFormat;
